@@ -1,0 +1,152 @@
+/* ===== ESTILO LOGIN ===== */
+body {
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.login-container {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 310px;
+  padding: 50px;
+  /* ===== ESTILO LOGIN ===== */
+  body {
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* ===== CONTENEDOR PRINCIPAL ===== */
+  .login-container {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 310px;
+    padding: 50px;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeInUp 0.8s forwards;
+  }
+
+  /* Animación entrada suave */
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ===== LOGO CON FONDO AZUL REDONDO ===== */
+  .logo-container {
+    background-color: #004d80;  /* azul corporativo */
+    border-radius: 50%;         /* forma circular */
+    width: 180px;               /* un poco más grande */
+    height: 180px;              /* igual ancho y alto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 25px auto;   /* centrado */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* sutil sombra */
+  }
+
+  .logo-container img {
+    width: 170px;   /* tamaño interno del logo */
+    height: 170px;
+    object-fit: contain;
+    animation: slideIn 1s ease-out;
+  }
+
+  /* Animación entrada lateral del logo */
+  @keyframes slideIn {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* ===== CAMPOS DEL FORMULARIO ===== */
+  .form-control {
+    border-radius: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #000000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+  }
+
+  /* ===== BOTÓN PRINCIPAL ===== */
+  .btn-danger {
+    background-color: #004d80;
+    color: #ffffff;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-danger:hover {
+    background-color: #00385f;
+    transform: translateY(-2px);
+  }
+
+  /* ===== PIE DE PÁGINA ===== */
+  .footer a {
+    color: #050505;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+    color: #5871a4;
+  }
+
+  /* ===== MODAL DE RECUPERAR CONTRASEÑA ===== */
+  .modal-content {
+    border-radius: 15px;
+    animation: fadeInModal 0.5s ease-out;
+  }
+
+  @keyframes fadeInModal {
+    0% {
+      transform: translateY(-50%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header {
+    background-color: #004d80;
+    color: #ffffff;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .modal-footer button {
+    background-color: #42a42f;
+    color: #000000;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  .modal-footer button:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+}

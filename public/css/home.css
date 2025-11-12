@@ -1,0 +1,178 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== BODY ===== */
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  height: 100vh; /* ocupa toda la altura visible */
+  overflow: hidden; /* evita scroll vertical */
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #004d80;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #a6a9ac #004d80;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background-color: #a6a9ac; border-radius: 3px; }
+.sidebar .logo { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+.sidebar .logo img { width: 125px; height: 110px; }
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li { width: 100%; }
+.sidebar ul li a {
+  display: block;
+  padding: 13px 15px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background 0.3s;
+  text-align: center;
+}
+.sidebar ul li a:hover { background-color: #a6a9ac; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  margin-left: 270px;
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+header {
+  text-align: center;
+  padding: 15px;
+  background-color: #004d80;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+header h1 { font-size: 1.8rem; color: #fff; }
+
+/* ===== GRID TARJETAS ===== */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr)); /* 5 tarjetas con mínimo 180px */
+  grid-template-rows: repeat(2, 260px); /* 2 filas de altura fija */
+  gap: 20px;
+  padding: 10px 20px;
+  align-items: center;
+  justify-items: center;
+  flex-grow: 1;
+}
+
+/* TARJETAS */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  width: 100%; /* ocupa toda la celda */
+  height: 100%; /* ocupa toda la altura de la celda */
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.card:hover { transform: translateY(-5px); }
+.card .icon img { width: 65px; height: 65px; margin: 0 auto 10px auto; }
+.card h2 { font-size: 1.1rem; margin-bottom: 5px; color: #333; }
+.card p { font-size: 0.9rem; color: #666; }
+
+/* BOTONES */
+.btn { display: inline-block; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 1rem; background-color: #004d80; color: white; cursor: pointer; }
+.btn-danger { background-color: #dc3545; color: white; padding: 10px; border-radius: 10px; display: block; margin: 20px auto; width: 80%; text-align: center; }
+.btn-danger i { margin-right: 6px; font-size: 14px; }
+
+/* ===== FOOTER ===== */
+footer {
+  background-color: #004d80;
+  color: #ffffff;
+  text-align: center;
+  padding: 15px 10px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 1.0rem;
+  flex-shrink: 0;
+  width: 100%;
+}
+footer a {
+  color: #a6a9ac;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s;
+}
+footer a:hover { color: #ffffff; }
+
+/* ===== MENU TOGGLE ===== */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #004d80;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+/* ===== MEDIA QUERIES ===== */
+@media (max-width: 1200px) {
+  .grid-container {
+    grid-template-columns: repeat(3, minmax(180px,1fr));
+    grid-template-rows: repeat(4, 180px);
+    height: auto;
+  }
+  body { overflow: auto; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.active { transform: translateX(0); }
+  .menu-toggle { display: block; }
+  .main-content { margin-left: 0; }
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    height: auto;
+  }
+  body { overflow: auto; }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+  body { overflow: auto; }
+}

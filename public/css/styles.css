@@ -1,0 +1,281 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  background-color: #f4f7fc;
+  color: #333;
+}
+
+/* Cabecera */
+header {
+  margin-bottom: 30px;
+  background-color: #004d80;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+/* Botón de Inicio */
+header .btn-primary {
+display: flex;
+align-items: center;
+background-color: #eb9c14;
+border-color: #f5c721;
+padding: 10px 20px;
+font-size: 1rem;
+border-radius: 5px;
+text-decoration: none;
+color: white;
+transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header .btn-primary:hover {
+background-color: #e0b30e;
+color: #fff;
+}
+
+header .btn-primary i {
+margin-right: 10px;
+}
+
+header h1 {
+font-size: 2rem;
+font-weight: 600;
+}
+
+/* Estilos del Modal */
+.modal-header {
+  background-color: #004d80;
+  color: white;
+}
+.modal-title {
+  font-weight: 600;
+}
+
+.modal-body {
+  background-color: #f7f7f7;
+}
+
+/* Botón de Agregar Reporte */
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+/* Tabla de Reporte */
+.table {
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.table th {
+  background-color: #004d80;
+  color: white;
+}
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Buscador y Filtros */
+#search {
+  margin: 20px 0;
+  width: 40%;
+}
+    /* Barra lateral de navegación */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #004d80;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #a6a9ac #004d80;
+    }
+    
+      /* Estilos del scroll en la barra lateral */
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background-color: #a6a9ac;
+      border-radius: 3px;
+    }
+    
+      /* Logo dentro de la barra lateral */
+    .sidebar .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .sidebar .logo img {
+      width: 125px;
+      height: 110px;
+    }
+    
+      /* Lista de navegación dentro de la barra lateral */
+    .sidebar ul {
+      list-style: none;
+      width: 100%;
+      padding: 0;
+    }
+    
+    .sidebar ul li {
+    width: 100%;
+    }
+    
+    .sidebar ul li a {
+      display: block;
+      padding: 13px 15px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background 0.3s;
+      text-align: center;
+    }
+    
+      /* Cambio de color en hover para los enlaces de la barra lateral */
+    .sidebar ul li a:hover {
+      background-color: #a6a9ac;
+    }
+
+/* Contenedor principal */
+.main-content {
+  margin-left: 270px;
+  padding: 20px;
+  min-height: 100vh;        /* hace que ocupe toda la altura visible */
+  display: flex;            /* permite usar flexbox */
+  flex-direction: column;   /* organiza el contenido en columna */
+  box-sizing: border-box;
+}
+.btn-rojo {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  display: block;
+  margin: 20px auto;
+  width: 80%;
+}
+
+.btn-danger i {
+margin-right: 6px;
+font-size: 14px;
+}
+/* Boton Editar y Eliminar */
+button.btn-sm {
+padding: 0.75 rem 0.75rem;
+}
+/* ===== FOOTER ===== */
+footer {
+  background-color: #004d80;
+  color: #ffffff;
+  text-align: center;
+  padding: 15px 10px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 100%;
+}
+footer a {
+  color: #a6a9ac;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s;
+}
+footer a:hover { color: #ffffff; }
+
+/* ===== ESTILOS DE PAGINACIÓN ===== */
+.pagination {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pagination .page-item {
+  list-style: none;
+}
+
+.pagination .page-link {
+  padding: 8px 14px;
+  border: 1px solid #004d80;
+  border-radius: 5px;
+  color: #004d80;
+  background-color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.pagination .page-link:hover {
+  background-color: #004d80;
+  color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #004d80;
+  color: #fff;
+  border-color: #004d80;
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: #f4f7fc;
+  color: #6c757d;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+.pagination .page-link svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+    /* Media queries para hacer la página responsive */
+    @media (max-width: 768px) {
+      /* Oculta la barra lateral en móviles */
+    .sidebar {
+      transform: translateX(-100%);
+    }
+        /* Muestra la barra lateral cuando está activa */
+    .sidebar.active {
+      transform: translateX(0);
+    }
+        /* Muestra el botón de menú en móviles */
+    .menu-toggle {
+      display: block;
+    }
+        /* Ajusta el contenido principal en móviles */
+    .main-content {
+      margin-left: 0;
+    }
+
+    /* Ajusta el footer en móviles */
+    .footer {
+        margin-left: 0;
+    }
+
+    .footer-section {
+        flex: 100%;
+        text-align: center;
+    }
+  }
