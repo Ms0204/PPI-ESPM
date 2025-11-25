@@ -28,7 +28,7 @@
         <tbody>
             @foreach($reportes as $index => $reporte)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ count($reportes) - $index }}</td>
                 <td>{{ str_pad($reporte->id, 4, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $reporte->tituloReporte }}</td>
                 <td>{{ $reporte->descripcion }}</td>

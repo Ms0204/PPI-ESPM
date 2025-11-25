@@ -11,7 +11,8 @@ class Ingresos extends Model
         'cantidad',
         'fechaIngreso',
         'idProducto',
-        'codigoInventario'
+        'codigoInventario',
+        'observacion'
     ];
 
     public $timestamps = true;

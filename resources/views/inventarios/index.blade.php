@@ -51,7 +51,7 @@
             @endif
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <input type="text" id="search" class="form-control" placeholder="Buscar Inventarios" />
+                <input type="text" id="search" class="form-control" placeholder="Buscar Inventarios" value="{{ request('search') }}" style="max-width: 400px;" />
                 <div class="d-flex gap-2">
                     <a href="{{ route('inventarios.pdf') }}" class="btn btn-danger">
                         <i class="fas fa-file-pdf"></i> Generar Reporte
@@ -65,7 +65,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center">
                     <label class="me-2">Mostrar:</label>
-                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value">
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value+'&search={{ request('search') }}'">
                         <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
                         <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
                         <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
@@ -74,18 +74,19 @@
                 </div>
             </div>
 
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código</th>
-                        <th>Tipo Movimiento</th>
-                        <th>Fecha Registro</th>
-                        <th>Cantidad Productos</th>
-                        <th>Cédula Usuario</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Tipo Movimiento</th>
+                            <th>Fecha Registro</th>
+                            <th>Cantidad Productos</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @if(isset($inventarios) && $inventarios->count() > 0)
                         @foreach($inventarios as $index => $inventario)
@@ -95,7 +96,12 @@
                                 <td>{{ $inventario->tipoMovimiento }}</td>
                                 <td>{{ date('Y-m-d', strtotime($inventario->fechaRegistro)) }}</td>
                                 <td>{{ $inventario->cantidadProductos }}</td>
-                                <td>{{ $inventario->cedulaUsuario }}</td>
+                                <td>
+                                    {{ $inventario->cedulaUsuario }}
+                                    @if($inventario->usuario)
+                                        - {{ $inventario->usuario->nombres }} {{ $inventario->usuario->apellidos }}
+                                    @endif
+                                </td>
                                 <td>
                                     <button
                                         type="button"
@@ -128,6 +134,7 @@
                     @endif
                 </tbody>
             </table>
+            </div>
 
             @if(isset($inventarios) && $inventarios->count() > 0)
                 <div class="d-flex justify-content-center mt-4">
@@ -272,6 +279,35 @@
 
                 document.getElementById('editInventoryForm').action = `/inventarios/${id}`;
             });
+        });
+
+        // Búsqueda en tiempo real
+        const searchInput = document.getElementById('search');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const perPage = '{{ request("per_page", 5) }}';
+                const searchValue = this.value;
+                window.location.href = `?per_page=${perPage}&search=${searchValue}`;
+            }, 500);
+        });
+
+        // Función para abrir/cerrar menú en móviles
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
 </body>

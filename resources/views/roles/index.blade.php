@@ -65,23 +65,28 @@
                     <span class="ms-2">registros</span>
                 </div>
             </div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Id</th>
-                        <th>Nombre</th>
-                        <th>Descripcion</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @forelse ($roles as $index => $rol)
                         <tr>
-                            <td>{{ $rol->id }}</td>
                             <td>{{ 'RL-' . str_pad($rol->id, 3, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $rol->nombre }}</td>
                             <td>{{ $rol->descripcion }}</td>
+                            <td>
+                                <span class="badge {{ $rol->estado == 'Activo' ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $rol->estado }}
+                                </span>
+                            </td>
                             <td>
                                 <button
                                     type="button"
@@ -97,9 +102,15 @@
                                 <form action="{{ route('roles.destroy', $rol->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" onclick="return confirm('¿Eliminar este rol?')" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    @if($rol->permisos()->exists())
+                                        <button type="submit" onclick="return confirm('¿{{ $rol->estado == 'Activo' ? 'Desactivar' : 'Activar' }} este rol?')" class="btn btn-{{ $rol->estado == 'Activo' ? 'danger' : 'success' }} btn-sm">
+                                            <i class="fas fa-{{ $rol->estado == 'Activo' ? 'user-slash' : 'user-check' }}"></i>
+                                        </button>
+                                    @else
+                                        <button type="submit" onclick="return confirm('¿Eliminar este rol permanentemente?')" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    @endif
                                 </form>
                             </td>
                         </tr>
@@ -110,6 +121,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
             <div class="d-flex justify-content-center mt-4">
                 {{ $roles->links() }}
             </div>
@@ -194,6 +206,22 @@
 
                 document.getElementById('editRolForm').action = `/roles/${id}`;
             });
+        });
+
+        // Función para abrir/cerrar menú en móviles
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

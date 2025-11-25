@@ -9,7 +9,8 @@ class Productos extends Model
     protected $table = 'productos';
     protected $fillable = [
         'nombre',
-        'cantidad'
+        'cantidad',
+        'idCategoria'
     ];
 
     public $timestamps = true;
@@ -17,4 +18,12 @@ class Productos extends Model
     protected $casts = [
         'cantidad' => 'integer'
     ];
+
+    /**
+     * Relación: Un producto pertenece a una categoría
+     */
+    public function categoria()
+    {
+        return $this->belongsTo(Categorias::class, 'idCategoria', 'id');
+    }
 }

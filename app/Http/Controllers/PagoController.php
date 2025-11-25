@@ -15,7 +15,25 @@ class PagoController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $pagos = Pagos::orderBy('created_at', 'desc')->paginate($perPage)->appends(['per_page' => $perPage]);
+        $search = $request->get('search');
+        
+        $pagos = Pagos::with('usuario')
+            ->when($search, function($query) use ($search) {
+                $query->where('id', 'like', "%{$search}%")
+                      ->orWhere('numeroPago', 'like', "%{$search}%")
+                      ->orWhere('metodoPago', 'like', "%{$search}%")
+                      ->orWhere('cantidad', 'like', "%{$search}%")
+                      ->orWhere('fechaPago', 'like', "%{$search}%")
+                      ->orWhere('cedulaUsuario', 'like', "%{$search}%")
+                      ->orWhereHas('usuario', function($q) use ($search) {
+                          $q->where('nombres', 'like', "%{$search}%")
+                            ->orWhere('apellidos', 'like', "%{$search}%");
+                      });
+            })
+            ->orderBy('fechaPago', 'desc')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage, 'search' => $search]);
+            
         $usuarios = Usuarios::where('activo', true)->get();
         return view('pagos.index', compact('pagos', 'usuarios'));
     }
@@ -100,7 +118,7 @@ class PagoController extends Controller
      */
     public function generarPDF()
     {
-        $pagos = Pagos::with('usuario')->orderBy('created_at','desc')->get();
+        $pagos = Pagos::with('usuario')->orderBy('fechaPago','desc')->get();
         $pdf = Pdf::loadView('pagos.pdf', compact('pagos'));
         return $pdf->download('reporte_pagos_'.date('Y-m-d').'.pdf');
     }

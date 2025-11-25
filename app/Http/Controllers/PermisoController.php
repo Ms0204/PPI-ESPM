@@ -16,7 +16,7 @@ class PermisoController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $permisos = Permisos::orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);
+        $permisos = Permisos::with(['usuario', 'rol'])->orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);
         $usuarios = Usuarios::all();
         $roles = Roles::all();
         return view('permisos.index', compact('permisos','usuarios','roles'));
@@ -36,14 +36,27 @@ class PermisoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fechaAsignacion' => 'required|date',
-            'estado' => 'required',
             'cedulaUsuario' => 'required|exists:usuarios,cedula',
             'idRol' => 'required|exists:roles,id',
         ]);
 
+        // Verificar si ya existe un permiso con la misma combinación de usuario y rol
+        $existePermiso = Permisos::where('cedulaUsuario', $request->cedulaUsuario)
+                                  ->where('idRol', $request->idRol)
+                                  ->exists();
+        
+        if ($existePermiso) {
+            return redirect()->route('permisos.index')
+                           ->with('error', 'Ya existe un permiso con este usuario y rol.');
+        }
+
         // Do not accept id from the user; DB will auto-generate primary key.
-        Permisos::create($request->only(['fechaAsignacion','estado','cedulaUsuario','idRol']));
+        // Set fechaAsignacion to current date and estado to 'Activo' automatically
+        $data = $request->only(['cedulaUsuario','idRol']);
+        $data['fechaAsignacion'] = date('Y-m-d');
+        $data['estado'] = 'Activo';
+        
+        Permisos::create($data);
         return redirect()->route('permisos.index')->with('success', 'Permiso creado correctamente.');
     }
 
@@ -75,6 +88,17 @@ class PermisoController extends Controller
             'cedulaUsuario' => 'required|exists:usuarios,cedula',
             'idRol' => 'required|exists:roles,id',
         ]);
+
+        // Verificar si ya existe otro permiso con la misma combinación de usuario y rol
+        $existePermiso = Permisos::where('cedulaUsuario', $request->cedulaUsuario)
+                                  ->where('idRol', $request->idRol)
+                                  ->where('id', '!=', $id)
+                                  ->exists();
+        
+        if ($existePermiso) {
+            return redirect()->route('permisos.index')
+                           ->with('error', 'Ya existe un permiso con este usuario y rol.');
+        }
 
         // Do not allow changing the PK id. Update only allowed fields.
         $permiso->update($request->only(['fechaAsignacion','estado','cedulaUsuario','idRol']));

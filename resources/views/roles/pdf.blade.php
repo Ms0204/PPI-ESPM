@@ -19,16 +19,20 @@
     <div class="header">
         <h1>Reporte de Roles</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ date('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Nombre</th><th>Descripción</th><th>Fecha de Creación</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha de Creación</th>
+            </tr>
         </thead>
         <tbody>
             @foreach($roles as $index => $rol)
             <tr>
-                <td>{{ $index + 1 }}</td>
                 <td>{{ 'RL-' . str_pad($rol->id, 3, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $rol->nombre }}</td>
                 <td>{{ $rol->descripcion }}</td>

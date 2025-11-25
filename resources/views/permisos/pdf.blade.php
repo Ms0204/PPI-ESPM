@@ -22,20 +22,19 @@
     <div class="header">
         <h1>Reporte de Permisos</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ date('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Usuario</th><th>Rol</th><th>Fecha Asignación</th><th>Estado</th></tr>
+            <tr><th>ID</th><th>Fecha Asignación</th><th>Usuario</th><th>Rol</th><th>Estado</th></tr>
         </thead>
         <tbody>
             @foreach($permisos as $index => $permiso)
             <tr>
-                <td>{{ $index + 1 }}</td>
                 <td>{{ 'PR-' . str_pad($permiso->id, 3, '0', STR_PAD_LEFT) }}</td>
-                <td>{{ $permiso->usuario->nombres ?? 'N/A' }} {{ $permiso->usuario->apellidos ?? '' }}</td>
-                <td>{{ $permiso->rol->nombre ?? 'N/A' }}</td>
                 <td>{{ \Carbon\Carbon::parse($permiso->fechaAsignacion)->format('d/m/Y') }}</td>
+                <td>{{ $permiso->cedulaUsuario }} - {{ $permiso->usuario->nombres ?? 'N/A' }} {{ $permiso->usuario->apellidos ?? '' }}</td>
+                <td>{{ 'RL-' . str_pad($permiso->idRol, 3, '0', STR_PAD_LEFT) }} - {{ $permiso->rol->nombre ?? 'N/A' }}</td>
                 <td><span class="badge badge-{{ $permiso->estado == 'Activo' ? 'success' : 'danger' }}">{{ $permiso->estado }}</span></td>
             </tr>
             @endforeach

@@ -28,7 +28,7 @@
         <tbody>
             @foreach($egresos as $index => $egreso)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ count($egresos) - $index }}</td>
                 <td>{{ 'EG-' . str_pad($egreso->id, 2, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $egreso->producto->nombre ?? 'N/A' }}</td>
                 <td>{{ $egreso->cantidad }}</td>

@@ -44,7 +44,7 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <input type="text" id="search" class="form-control" placeholder="Buscar Categoria" aria-label="Buscar Categoria">
+                <input type="text" id="search" class="form-control" placeholder="Buscar Categoria" value="{{ request('search') }}" style="max-width: 400px;" aria-label="Buscar Categoria">
                 <div class="d-flex gap-2">
                     <a href="{{ route('categorias.pdf') }}" class="btn btn-danger">
                         <i class="fas fa-file-pdf"></i> Generar Reporte
@@ -57,7 +57,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center">
                     <label class="me-2">Mostrar:</label>
-                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value">
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value+'&search={{ request('search') }}'">
                         <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
                         <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
                         <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
@@ -65,25 +65,24 @@
                     <span class="ms-2">registros</span>
                 </div>
             </div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Id</th>
-                        <th>Nombre</th>
-                        <th>Descripcion</th>
-                        <th>Id Producto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @forelse ($categorias as $index => $categoria)
                         <tr>
-                            <td>{{ $categoria->id }}</td>
+                            <td>{{ $categorias->total() - ($categorias->firstItem() + $index) + 1 }}</td>
                             <td>{{ 'CTG-' . str_pad($categoria->id, 2, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $categoria->nombre }}</td>
                             <td>{{ $categoria->descripcion }}</td>
-                            <td>{{ $categoria->idProducto }}</td>
                             <td>
                                 <button
                                     type="button"
@@ -91,7 +90,6 @@
                                     data-id="{{ $categoria->id }}"
                                     data-nombre="{{ $categoria->nombre }}"
                                     data-descripcion="{{ $categoria->descripcion }}"
-                                    data-idproducto="{{ $categoria->idProducto }}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editCategoriaModal"
                                 >
@@ -108,11 +106,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">No hay categorías registradas.</td>
+                            <td colspan="5" class="text-center">No hay categorías registradas.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
             <div class="d-flex justify-content-center mt-4">
                 {{ $categorias->links() }}
             </div>
@@ -140,15 +139,6 @@
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripcion</label>
                         <input type="text" name="descripcion" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="idProducto" class="form-label">Producto</label>
-                        <select name="idProducto" id="idProducto" class="form-control" required>
-                            <option value="">Seleccione un producto</option>
-                            @foreach($productos as $producto)
-                                <option value="{{ $producto->id }}">{{ str_pad($producto->id,3,'0',STR_PAD_LEFT) }} - {{ $producto->nombre }}</option>
-                            @endforeach
-                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -183,15 +173,6 @@
                         <label for="editDescripcion" class="form-label">Descripcion</label>
                         <input type="text" name="descripcion" id="editDescripcion" class="form-control" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="editIdProducto" class="form-label">Producto</label>
-                        <select name="idProducto" id="editIdProducto" class="form-control" required>
-                            <option value="">Seleccione un producto</option>
-                            @foreach($productos as $producto)
-                                <option value="{{ $producto->id }}">{{ str_pad($producto->id,3,'0',STR_PAD_LEFT) }} - {{ $producto->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -206,7 +187,6 @@
                 const id = button.dataset.id;
                 const nombre = button.dataset.nombre;
                 const descripcion = button.dataset.descripcion;
-                const idProducto = button.dataset.idproducto;
 
                 // display CTG- prefix with padded id
                 document.getElementById('editId').value = id;
@@ -214,14 +194,37 @@
                 document.getElementById('editNombre').value = nombre;
                 document.getElementById('editDescripcion').value = descripcion;
 
-                // set producto select
-                const productoSelect = document.getElementById('editIdProducto');
-                Array.from(productoSelect.options).forEach(option => {
-                    option.selected = (option.value === idProducto);
-                });
-
                 document.getElementById('editCategoriaForm').action = `/categorias/${id}`;
             });
+        });
+
+        // Búsqueda en tiempo real
+        const searchInput = document.getElementById('search');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const perPage = '{{ request("per_page", 5) }}';
+                const searchValue = this.value;
+                window.location.href = `?per_page=${perPage}&search=${searchValue}`;
+            }, 500);
+        });
+
+        // Función para abrir/cerrar menú en móviles
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

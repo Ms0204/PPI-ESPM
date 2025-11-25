@@ -12,7 +12,8 @@ class Egresos extends Model
         'cantidad',
         'fechaEgreso',
         'idProducto',
-        'codigoInventario'
+        'codigoInventario',
+        'observacion'
     ];
 
     public $timestamps = true;

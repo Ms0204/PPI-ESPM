@@ -14,7 +14,17 @@ class RolController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $roles = Roles::orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);
+        $search = $request->get('search');
+        
+        $roles = Roles::when($search, function($query) use ($search) {
+                $query->where('id', 'like', "%{$search}%")
+                      ->orWhere('nombre', 'like', "%{$search}%")
+                      ->orWhere('descripcion', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at','desc')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage, 'search' => $search]);
+            
         return view('roles.index', compact('roles'));
     }
 
@@ -81,8 +91,21 @@ class RolController extends Controller
     public function destroy(string $id)
     {
         $rol = Roles::findOrFail($id);
-        $rol->delete();
-        return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente.');
+        
+        // Verificar si tiene permisos relacionados
+        $tieneRelaciones = $rol->permisos()->exists();
+        
+        if ($tieneRelaciones) {
+            // Eliminación lógica: alternar estado
+            $rol->estado = ($rol->estado == 'Activo') ? 'Inactivo' : 'Activo';
+            $rol->save();
+            $mensaje = $rol->estado == 'Activo' ? 'activado' : 'desactivado';
+            return redirect()->route('roles.index')->with('success', "Rol {$mensaje} correctamente.");
+        } else {
+            // Eliminación física
+            $rol->delete();
+            return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente.');
+        }
     }
 
     /**

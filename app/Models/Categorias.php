@@ -10,17 +10,16 @@ class Categorias extends Model
     
     protected $fillable = [
         'nombre',
-        'descripcion',
-        'idProducto'
+        'descripcion'
     ];
 
     public $timestamps = true;
 
     /**
-     * Relación con Producto
+     * Relación: Una categoría tiene muchos productos
      */
-    public function producto()
+    public function productos()
     {
-        return $this->belongsTo(Productos::class, 'idProducto', 'id');
+        return $this->hasMany(Productos::class, 'idCategoria', 'id');
     }
 }

@@ -16,12 +16,23 @@ class InventarioController extends Controller
     {
         try {
             $perPage = $request->get('per_page', 5);
-            $query = new Inventarios();
-            $inventarios = $query->newQuery()
-                ->select('*')
+            $search = $request->get('search');
+            
+            $inventarios = Inventarios::with('usuario')
+                ->when($search, function($query) use ($search) {
+                    $query->where('codigo', 'like', "%{$search}%")
+                          ->orWhere('tipoMovimiento', 'like', "%{$search}%")
+                          ->orWhere('cantidadProductos', 'like', "%{$search}%")
+                          ->orWhere('fechaRegistro', 'like', "%{$search}%")
+                          ->orWhere('cedulaUsuario', 'like', "%{$search}%")
+                          ->orWhereHas('usuario', function($q) use ($search) {
+                              $q->where('nombres', 'like', "%{$search}%")
+                                ->orWhere('apellidos', 'like', "%{$search}%");
+                          });
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage)
-                ->appends(['per_page' => $perPage]);
+                ->appends(['per_page' => $perPage, 'search' => $search]);
             
             $usuarios = Usuarios::where('activo', true)->get();
         } catch (\Exception $e) {

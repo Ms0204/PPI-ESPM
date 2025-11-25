@@ -68,17 +68,17 @@
     <div class="header">
         <h1>Reporte de Usuarios</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ date('d/m/Y') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>#</th>
                 <th>Cédula</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
                 <th>Correo</th>
+                <th>Dirección</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
             </tr>
@@ -86,11 +86,11 @@
         <tbody>
             @foreach($usuarios as $index => $usuario)
             <tr>
-                <td>{{ $index + 1 }}</td>
                 <td>{{ $usuario->cedula }}</td>
                 <td>{{ $usuario->nombres }}</td>
                 <td>{{ $usuario->apellidos }}</td>
                 <td>{{ $usuario->correo }}</td>
+                <td>{{ $usuario->direccion }}</td>
                 <td>{{ $usuario->telefono }}</td>
                 <td>
                     @if($usuario->activo)

@@ -28,7 +28,7 @@
         <tbody>
             @foreach($ingresos as $index => $ingreso)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ count($ingresos) - $index }}</td>
                 <td>{{ 'IG-' . str_pad($ingreso->id, 2, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $ingreso->producto->nombre ?? 'N/A' }}</td>
                 <td>{{ $ingreso->cantidad }}</td>

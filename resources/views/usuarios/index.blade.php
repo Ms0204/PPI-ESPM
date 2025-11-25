@@ -64,7 +64,7 @@
       @endif
 
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <input type="text" id="search" class="form-control" placeholder="Buscar Usuarios" />
+        <input type="text" id="search" class="form-control" placeholder="Buscar Usuarios" value="{{ request('search') }}" style="max-width: 400px;" />
         <div class="d-flex gap-2">
           <a href="{{ route('usuarios.pdf') }}" class="btn btn-danger">
             <i class="fas fa-file-pdf"></i> Generar Reporte
@@ -78,7 +78,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
           <label class="me-2">Mostrar:</label>
-          <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value">
+          <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value+'&search={{ request('search') }}'">
             <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
             <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
             <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
@@ -87,24 +87,23 @@
         </div>
       </div>
 
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Cédula</th>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th>Correo</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Cédula</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Correo</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
         <tbody>
           @forelse ($usuarios as $index => $usuario)
           <tr>
-            <td>{{ $usuarios->total() - ($usuarios->firstItem() + $index) + 1 }}</td>
             <td>{{ $usuario->cedula }}</td>
             <td>{{ $usuario->nombres }}</td>
             <td>{{ $usuario->apellidos }}</td>
@@ -143,11 +142,12 @@
           </tr>
           @empty
           <tr>
-            <td colspan="9" class="text-center">No hay usuarios registrados.</td>
+            <td colspan="8" class="text-center">No hay usuarios registrados.</td>
           </tr>
           @endforelse
         </tbody>
       </table>
+      </div>
 
       <div class="d-flex justify-content-center mt-4">
         {{ $usuarios->links() }}
@@ -169,29 +169,56 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
+          @if ($errors->any())
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
           <div class="mb-3">
             <label for="addCedula" class="form-label">Cédula</label>
-            <input type="text" name="cedula" id="addCedula" class="form-control" pattern="[0-9]{10}" minlength="10" maxlength="10" required />
+            <input type="text" name="cedula" id="addCedula" class="form-control @error('cedula') is-invalid @enderror" pattern="[0-9]{10}" minlength="10" maxlength="10" value="{{ old('cedula') }}" required />
+            @error('cedula')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="addNombres" class="form-label">Nombres</label>
-            <input type="text" name="nombres" id="addNombres" class="form-control" required />
+            <input type="text" name="nombres" id="addNombres" class="form-control @error('nombres') is-invalid @enderror" value="{{ old('nombres') }}" required />
+            @error('nombres')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="addApellidos" class="form-label">Apellidos</label>
-            <input type="text" name="apellidos" id="addApellidos" class="form-control" required />
+            <input type="text" name="apellidos" id="addApellidos" class="form-control @error('apellidos') is-invalid @enderror" value="{{ old('apellidos') }}" required />
+            @error('apellidos')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="addCorreo" class="form-label">Correo Electrónico</label>
-            <input type="email" name="correo" id="addCorreo" class="form-control" required />
+            <input type="email" name="correo" id="addCorreo" class="form-control @error('correo') is-invalid @enderror" value="{{ old('correo') }}" required />
+            @error('correo')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="addDireccion" class="form-label">Dirección</label>
-            <input type="text" name="direccion" id="addDireccion" class="form-control" required />
+            <input type="text" name="direccion" id="addDireccion" class="form-control @error('direccion') is-invalid @enderror" value="{{ old('direccion') }}" required />
+            @error('direccion')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="addTelefono" class="form-label">Teléfono</label>
-            <input type="text" name="telefono" id="addTelefono" class="form-control" maxlength="15" required />
+            <input type="text" name="telefono" id="addTelefono" class="form-control @error('telefono') is-invalid @enderror" maxlength="15" value="{{ old('telefono') }}" required />
+            @error('telefono')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
         </div>
         <div class="modal-footer">
@@ -208,35 +235,62 @@
       <form id="editUserForm" method="POST" class="modal-content">
         @csrf
         @method('PUT')
-        <input type="hidden" name="id" id="editId" />
+        <input type="hidden" name="id" id="editId" value="{{ old('id') }}" />
         <div class="modal-header">
           <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
+          @if ($errors->any() && old('id'))
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
           <div class="mb-3">
             <label for="editCedula" class="form-label">Cédula</label>
-            <input type="text" name="cedula" id="editCedula" class="form-control" required />
+            <input type="text" name="cedula" id="editCedula" class="form-control @error('cedula') is-invalid @enderror" pattern="[0-9]{10}" minlength="10" maxlength="10" required />
+            @error('cedula')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="editNombres" class="form-label">Nombres</label>
-            <input type="text" name="nombres" id="editNombres" class="form-control" required />
+            <input type="text" name="nombres" id="editNombres" class="form-control @error('nombres') is-invalid @enderror" required />
+            @error('nombres')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="editApellidos" class="form-label">Apellidos</label>
-            <input type="text" name="apellidos" id="editApellidos" class="form-control" required />
+            <input type="text" name="apellidos" id="editApellidos" class="form-control @error('apellidos') is-invalid @enderror" required />
+            @error('apellidos')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="editCorreo" class="form-label">Correo</label>
-            <input type="email" name="correo" id="editCorreo" class="form-control" required />
+            <input type="email" name="correo" id="editCorreo" class="form-control @error('correo') is-invalid @enderror" required />
+            @error('correo')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="editDireccion" class="form-label">Dirección</label>
-            <input type="text" name="direccion" id="editDireccion" class="form-control" required />
+            <input type="text" name="direccion" id="editDireccion" class="form-control @error('direccion') is-invalid @enderror" required />
+            @error('direccion')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="mb-3">
             <label for="editTelefono" class="form-label">Teléfono</label>
-            <input type="text" name="telefono" id="editTelefono" class="form-control" required />
+            <input type="text" name="telefono" id="editTelefono" class="form-control @error('telefono') is-invalid @enderror" maxlength="15" required />
+            @error('telefono')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
           <div class="form-check">
             <input type="checkbox" name="activo" id="editActivo" class="form-check-input" />
@@ -254,9 +308,42 @@
   <!-- ===== SCRIPTS ===== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Abrir modal si hay errores de validación
+    @if ($errors->any())
+      @if(old('id'))
+        // Si hay un ID, es del formulario de edición
+        var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        // Cargar los datos del usuario que se estaba editando
+        document.getElementById('editUserForm').action = `/usuarios/{{ old('id') }}`;
+        document.getElementById('editId').value = '{{ old('id') }}';
+        document.getElementById('editCedula').value = '{{ old('cedula') }}';
+        document.getElementById('editNombres').value = '{{ old('nombres') }}';
+        document.getElementById('editApellidos').value = '{{ old('apellidos') }}';
+        document.getElementById('editCorreo').value = '{{ old('correo') }}';
+        document.getElementById('editDireccion').value = '{{ old('direccion') }}';
+        document.getElementById('editTelefono').value = '{{ old('telefono') }}';
+        document.getElementById('editActivo').checked = {{ old('activo') ? 'true' : 'false' }};
+        editUserModal.show();
+      @else
+        // Si no hay ID, es del formulario de agregar
+        var addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+        addUserModal.show();
+      @endif
+    @endif
+
     function toggleMenu() {
       document.querySelector('.sidebar').classList.toggle('active');
     }
+
+    // Cerrar menú al hacer clic fuera de él
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.sidebar');
+        const menuToggle = document.querySelector('.menu-toggle');
+        
+        if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
 
     document.querySelectorAll('.edit-btn').forEach(button => {
       button.addEventListener('click', () => {
@@ -276,6 +363,19 @@
     function confirmarCerrarSesion() {
       return confirm('¿Está seguro que desea cerrar sesión?');
     }
+
+    // Búsqueda en tiempo real
+    const searchInput = document.getElementById('search');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const perPage = '{{ request("per_page", 5) }}';
+            const searchValue = this.value;
+            window.location.href = `?per_page=${perPage}&search=${searchValue}`;
+        }, 500);
+    });
   </script>
 </body>
 </html>

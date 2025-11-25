@@ -10,8 +10,17 @@ class Roles extends Model
     
     protected $fillable = [
         'nombre',
-        'descripcion'
+        'descripcion',
+        'estado'
     ];
 
     public $timestamps = true;
+
+    /**
+     * Relación con permisos
+     */
+    public function permisos()
+    {
+        return $this->hasMany(Permisos::class, 'idRol', 'id');
+    }
 }

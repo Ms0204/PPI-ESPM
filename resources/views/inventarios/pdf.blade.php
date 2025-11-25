@@ -28,7 +28,7 @@
         <tbody>
             @foreach($inventarios as $index => $inventario)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ count($inventarios) - $index }}</td>
                 <td>{{ $inventario->codigo }}</td>
                 <td>{{ ucfirst($inventario->tipoMovimiento) }}</td>
                 <td>{{ $inventario->cantidadProductos }}</td>

@@ -14,7 +14,22 @@ class UsuarioController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $usuarios = Usuarios::orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);        
+        $search = $request->get('search');
+        
+        $usuarios = Usuarios::when($search, function($query) use ($search) {
+                $query->where('cedula', 'like', "%{$search}%")
+                      ->orWhere('nombres', 'like', "%{$search}%")
+                      ->orWhere('apellidos', 'like', "%{$search}%")
+                      ->orWhere('correo', 'like', "%{$search}%")
+                      ->orWhere('telefono', 'like', "%{$search}%")
+                      ->orWhere('cargo', 'like', "%{$search}%");
+            })
+            ->orderBy('activo', 'desc')
+            ->orderBy('apellidos', 'asc')
+            ->orderBy('nombres', 'asc')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage, 'search' => $search]);
+            
         return view('usuarios.index', compact('usuarios'));
     }
     /**
@@ -39,6 +54,13 @@ class UsuarioController extends Controller
             'correo' => 'required|email|unique:usuarios,correo',
             'direccion' => 'required',
             'telefono' => 'required|max:15',
+        ], [
+            'cedula.unique' => 'Esta cédula ya está registrada en el sistema.',
+            'correo.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+            'cedula.required' => 'La cédula es obligatoria.',
+            'cedula.size' => 'La cédula debe tener exactamente 10 dígitos.',
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'El correo electrónico debe ser válido.',
         ]);
 
         Usuarios::create($request->all());
@@ -77,10 +99,19 @@ class UsuarioController extends Controller
             'correo' => 'required|email|unique:usuarios,correo,' . $usuario->id,
             'direccion' => 'required',
             'telefono' => 'required|max:15',
-            'activo' => 'boolean'
+        ], [
+            'cedula.unique' => 'Esta cédula ya está registrada en el sistema.',
+            'correo.unique' => 'Este correo electrónico ya está registrado en el sistema.',
+            'cedula.required' => 'La cédula es obligatoria.',
+            'cedula.size' => 'La cédula debe tener exactamente 10 dígitos.',
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'El correo electrónico debe ser válido.',
         ]);
 
-        $usuario->update($request->all());
+        $data = $request->except('_token', '_method');
+        $data['activo'] = $request->has('activo') ? 1 : 0;
+
+        $usuario->update($data);
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
@@ -102,7 +133,10 @@ class UsuarioController extends Controller
      */
     public function generarPDF()
     {
-        $usuarios = Usuarios::orderBy('created_at','desc')->get();
+        $usuarios = Usuarios::orderBy('activo', 'desc')
+                            ->orderBy('apellidos', 'asc')
+                            ->orderBy('nombres', 'asc')
+                            ->get();
         $pdf = Pdf::loadView('usuarios.pdf', compact('usuarios'));
         return $pdf->download('reporte_usuarios_'.date('Y-m-d').'.pdf');
     }

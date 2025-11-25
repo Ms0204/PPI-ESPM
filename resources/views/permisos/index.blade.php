@@ -42,6 +42,9 @@
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <input type="text" id="search" class="form-control" placeholder="Buscar Permisos" />
                 <div class="d-flex gap-2">
@@ -64,26 +67,25 @@
                     <span class="ms-2">registros</span>
                 </div>
             </div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Id</th>
-                        <th>Fecha Asignación</th>
-                        <th>Cédula Usuario</th>
-                        <th>Id Rol</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Fecha Asignación</th>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @forelse ($permisos as $index => $permiso)
                         <tr>
-                            <td>{{ $permisos->total() - ($permisos->firstItem() + $index) + 1 }}</td>
                             <td>{{ 'PR-' . str_pad($permiso->id, 3, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ date('Y-m-d', strtotime($permiso->fechaAsignacion)) }}</td>
-                            <td>{{ $permiso->cedulaUsuario }}</td>
-                            <td>{{ 'RL-' . str_pad($permiso->idRol, 3, '0', STR_PAD_LEFT) }}</td>
+                            <td>{{ $permiso->cedulaUsuario }} - {{ $permiso->usuario->nombres ?? 'N/A' }} {{ $permiso->usuario->apellidos ?? '' }}</td>
+                            <td>{{ 'RL-' . str_pad($permiso->idRol, 3, '0', STR_PAD_LEFT) }} - {{ $permiso->rol->nombre ?? 'N/A' }}</td>
                             <td>
                                 @if($permiso->estado == 'Activo')
                                     <span class="badge bg-success">Activo</span>
@@ -115,11 +117,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">No hay permisos registrados.</td>
+                            <td colspan="6" class="text-center">No hay permisos registrados.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
             <div class="d-flex justify-content-center mt-4">
                 {{ $permisos->links() }}
             </div>
@@ -139,15 +142,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    {{-- ID se genera automáticamente y se muestra como PR-001, PR-002, ... --}}
-                    <div class="mb-3">
-                        <label for="fechaAsignacion" class="form-label">Fecha Asignación</label>
-                        <input type="date" name="fechaAsignacion" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="estado" class="form-label">Estado</label>
-                        <input type="text" name="estado" class="form-control" required />
-                    </div>
+                    {{-- ID y fecha de asignación se generan automáticamente --}}
                     <div class="mb-3">
                         <label for="cedulaUsuario" class="form-label">Cédula Usuario</label>
                         <select name="cedulaUsuario" id="cedulaUsuario" class="form-control" required>
@@ -192,7 +187,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="editFechaAsignacion" class="form-label">Fecha Asignación</label>
-                        <input type="date" name="fechaAsignacion" id="editFechaAsignacion" class="form-control" required />
+                        <input type="date" name="fechaAsignacion" id="editFechaAsignacion" class="form-control" readonly />
+                        <div class="form-text">La fecha de asignación se genera automáticamente y no se puede editar.</div>
                     </div>
                     <div class="mb-3">
                         <label for="editEstado" class="form-label">Estado</label>
@@ -245,6 +241,22 @@
 
                 document.getElementById('editPermisoForm').action = `/permisos/${id}`;
             });
+        });
+
+        // Función para abrir/cerrar menú en móviles
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

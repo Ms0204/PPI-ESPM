@@ -64,16 +64,18 @@
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Cantidad</th>
+                <th>Categoría</th>
                 <th>Fecha de Creación</th>
             </tr>
         </thead>
         <tbody>
             @foreach($productos as $index => $producto)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ count($productos) - $index }}</td>
                 <td>{{ str_pad($producto->id, 3, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $producto->nombre }}</td>
                 <td>{{ $producto->cantidad }}</td>
+                <td>{{ $producto->categoria->nombre ?? 'Sin categoría' }}</td>
                 <td>{{ $producto->created_at->format('d/m/Y') }}</td>
             </tr>
             @endforeach

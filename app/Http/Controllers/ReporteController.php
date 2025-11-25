@@ -14,8 +14,19 @@ class ReporteController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $reportes = Reportes::orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);
-            return view('reportes.index', compact('reportes'));
+        $search = $request->get('search');
+        
+        $reportes = Reportes::when($search, function($query) use ($search) {
+                $query->where('id', 'like', "%{$search}%")
+                      ->orWhere('tituloReporte', 'like', "%{$search}%")
+                      ->orWhere('descripcion', 'like', "%{$search}%")
+                      ->orWhere('fechaEmision', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at','desc')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage, 'search' => $search]);
+            
+        return view('reportes.index', compact('reportes'));
     }
 
     /**

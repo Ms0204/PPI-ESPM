@@ -19,22 +19,21 @@
     <div class="header">
         <h1>Reporte de Pagos</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ date('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Número</th><th>Método</th><th>Cantidad</th><th>Fecha</th><th>Usuario</th></tr>
+            <tr><th>ID</th><th>Número</th><th>Método</th><th>Cantidad</th><th>Fecha</th><th>Usuario</th></tr>
         </thead>
         <tbody>
             @foreach($pagos as $index => $pago)
             <tr>
-                <td>{{ $index + 1 }}</td>
                 <td>{{ str_pad($pago->id, 3, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $pago->numeroPago }}</td>
                 <td>{{ ucfirst($pago->metodoPago) }}</td>
                 <td>${{ number_format($pago->cantidad, 2) }}</td>
                 <td>{{ \Carbon\Carbon::parse($pago->fechaPago)->format('d/m/Y') }}</td>
-                <td>{{ $pago->usuario->nombres ?? 'N/A' }} {{ $pago->usuario->apellidos ?? '' }}</td>
+                <td>{{ $pago->usuario->nombres ?? 'N/A' }} {{ $pago->usuario->apellidos ?? '' }} - {{ $pago->cedulaUsuario }}</td>
             </tr>
             @endforeach
         </tbody>

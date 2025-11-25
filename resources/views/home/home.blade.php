@@ -81,6 +81,27 @@
     </footer>
   </div>
 
-  <script src="{{ asset('js/home.js') }}"></script>
+  <script>
+    // Función para alternar el menú en dispositivos móviles
+    function toggleMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera de él
+    document.addEventListener('click', function(event) {
+      const sidebar = document.querySelector('.sidebar');
+      const menuToggle = document.querySelector('.menu-toggle');
+      
+      if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Confirmación para cerrar sesión
+    function confirmarCerrarSesion() {
+      return confirm('¿Estás seguro de que deseas cerrar sesión?');
+    }
+  </script>
 </body>
 </html>

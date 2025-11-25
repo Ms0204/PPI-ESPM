@@ -44,7 +44,7 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <input type="text" id="search" class="form-control" placeholder="Buscar Egresos" aria-label="Buscar Egresos">
+                <input type="text" id="search" class="form-control" placeholder="Buscar Egresos" value="{{ request('search') }}" style="max-width: 400px;" aria-label="Buscar Egresos">
                 <div class="d-flex gap-2">
                     <a href="{{ route('egresos.pdf') }}" class="btn btn-danger">
                         <i class="fas fa-file-pdf"></i> Generar Reporte
@@ -57,7 +57,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center">
                     <label class="me-2">Mostrar:</label>
-                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value">
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href='?per_page='+this.value+'&search={{ request('search') }}'">
                         <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
                         <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
                         <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
@@ -65,18 +65,20 @@
                     <span class="ms-2">registros</span>
                 </div>
             </div>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Id</th>
-                        <th>Cantidad</th>
-                        <th>Fecha Egreso</th>
-                        <th>Id Producto</th>
-                        <th>Código Inventario</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Id</th>
+                            <th>Cantidad</th>
+                            <th>Fecha Egreso</th>
+                            <th>Producto</th>
+                            <th>Código Inventario</th>
+                            <th>Observación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @forelse ($egresos as $index => $egreso)
                         <tr>
@@ -84,8 +86,9 @@
                             <td>{{ 'EG-' . str_pad($egreso->id, 2, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $egreso->cantidad }}</td>
                             <td>{{ date('Y-m-d', strtotime($egreso->fechaEgreso)) }}</td>
-                            <td>{{ $egreso->idProducto }}</td>
+                            <td>{{ $egreso->producto ? str_pad($egreso->producto->id, 3, '0', STR_PAD_LEFT) . ' - ' . $egreso->producto->nombre : 'N/A' }}</td>
                             <td>{{ $egreso->codigoInventario }}</td>
+                            <td>{{ $egreso->observacion ?? '-' }}</td>
                             <td>
                                 <button
                                     type="button"
@@ -95,6 +98,7 @@
                                     data-fechaegreso="{{ $egreso->fechaEgreso }}"
                                     data-idproducto="{{ $egreso->idProducto }}"
                                     data-codigoinventario="{{ $egreso->codigoInventario }}"
+                                    data-observacion="{{ $egreso->observacion }}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editEgresoModal"
                                 >
@@ -111,11 +115,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">No hay egresos registrados.</td>
+                            <td colspan="8" class="text-center">No hay egresos registrados.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
             <div class="d-flex justify-content-center mt-4">
                 {{ $egresos->links() }}
             </div>
@@ -158,9 +163,13 @@
                         <select name="codigoInventario" id="codigoInventario" class="form-control" required>
                             <option value="">Seleccione inventario</option>
                             @foreach($inventarios as $inv)
-                                <option value="{{ $inv->id }}">{{ $inv->id }}</option>
+                                <option value="{{ $inv->codigo }}">{{ $inv->codigo }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacion" class="form-label">Observación</label>
+                        <textarea name="observacion" id="observacion" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -209,9 +218,13 @@
                         <select name="codigoInventario" id="editCodigoInventario" class="form-control" required>
                             <option value="">Seleccione inventario</option>
                             @foreach($inventarios as $inv)
-                                <option value="{{ $inv->id }}">{{ $inv->id }}</option>
+                                <option value="{{ $inv->codigo }}">{{ $inv->codigo }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editObservacion" class="form-label">Observación</label>
+                        <textarea name="observacion" id="editObservacion" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -229,12 +242,14 @@
                 const fecha = button.dataset.fechaegreso;
                 const idProducto = button.dataset.idproducto;
                 const codigo = button.dataset.codigoinventario;
+                const observacion = button.dataset.observacion;
 
                 // display EG- prefix with padded id
                 document.getElementById('editId').value = id;
                 document.getElementById('editIdDisplay').value = 'EG-' + String(id).padStart(2,'0');
                 document.getElementById('editCantidad').value = cantidad;
                 document.getElementById('editFechaEgreso').value = fecha;
+                document.getElementById('editObservacion').value = observacion || '';
 
                 // set producto select
                 const productoSelect = document.getElementById('editIdProducto');
@@ -250,6 +265,35 @@
 
                 document.getElementById('editEgresoForm').action = `/egresos/${id}`;
             });
+        });
+
+        // Búsqueda en tiempo real
+        const searchInput = document.getElementById('search');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const perPage = '{{ request("per_page", 5) }}';
+                const searchValue = this.value;
+                window.location.href = `?per_page=${perPage}&search=${searchValue}`;
+            }, 500);
+        });
+
+        // Función para abrir/cerrar menú en móviles
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

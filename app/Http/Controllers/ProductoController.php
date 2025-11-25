@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Productos;
+use App\Models\Categorias;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -14,8 +15,23 @@ class ProductoController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $productos = Productos::orderBy('created_at', 'desc')->paginate($perPage)->appends(['per_page' => $perPage]);
-            return view('productos.index', compact('productos'));
+        $search = $request->get('search');
+        
+        $productos = Productos::with('categoria')
+            ->when($search, function($query) use ($search) {
+                $query->where('id', 'like', "%{$search}%")
+                      ->orWhere('nombre', 'like', "%{$search}%")
+                      ->orWhere('cantidad', 'like', "%{$search}%")
+                      ->orWhereHas('categoria', function($q) use ($search) {
+                          $q->where('nombre', 'like', "%{$search}%");
+                      });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage, 'search' => $search]);
+            
+        $categorias = Categorias::all();
+        return view('productos.index', compact('productos', 'categorias'));
     }
 
     /**
@@ -34,10 +50,11 @@ class ProductoController extends Controller
         $request->validate([
             'nombre' => 'required',
             'cantidad' => 'required|integer|min:0',
+            'idCategoria' => 'nullable|exists:categorias,id',
         ]);
 
         // Do not accept ID from user; DB will auto-increment
-        Productos::create($request->only(['nombre','cantidad']));
+        Productos::create($request->only(['nombre','cantidad','idCategoria']));
         return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
     }
 
@@ -66,10 +83,11 @@ class ProductoController extends Controller
         $request->validate([
             'nombre' => 'required',
             'cantidad' => 'required|integer|min:0',
+            'idCategoria' => 'nullable|exists:categorias,id',
         ]);
 
         // Do not allow changing the primary key `id`.
-        $producto->update($request->only(['nombre','cantidad']));
+        $producto->update($request->only(['nombre','cantidad','idCategoria']));
         return redirect()->route('productos.index')->with('success', 'Producto actualizado correctamente.');
     }
     /**
@@ -87,7 +105,7 @@ class ProductoController extends Controller
      */
     public function generarPDF()
     {
-        $productos = Productos::orderBy('created_at','desc')->get();
+        $productos = Productos::with('categoria')->orderBy('created_at','desc')->get();
         $pdf = Pdf::loadView('productos.pdf', compact('productos'));
         return $pdf->download('reporte_productos_'.date('Y-m-d').'.pdf');
     }
