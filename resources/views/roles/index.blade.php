@@ -83,9 +83,11 @@
                             <td>{{ $rol->nombre }}</td>
                             <td>{{ $rol->descripcion }}</td>
                             <td>
-                                <span class="badge {{ $rol->estado == 'Activo' ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $rol->estado }}
-                                </span>
+                                @if($rol->estado == 'Activo')
+                                    <span class="badge bg-success">Activo</span>
+                                @else
+                                    <span class="badge bg-danger">Inactivo</span>
+                                @endif
                             </td>
                             <td>
                                 <button

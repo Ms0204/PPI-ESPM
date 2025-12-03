@@ -65,7 +65,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Timezone ajustada a Ecuador (America/Guayaquil) para fechas correctas en la aplicación
+    'timezone' => 'America/Guayaquil',
 
     /*
     |--------------------------------------------------------------------------

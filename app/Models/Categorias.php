@@ -10,7 +10,8 @@ class Categorias extends Model
     
     protected $fillable = [
         'nombre',
-        'descripcion'
+        'descripcion',
+        'estado'
     ];
 
     public $timestamps = true;

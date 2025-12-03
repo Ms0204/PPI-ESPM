@@ -69,43 +69,54 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Id</th>
                             <th>Nombre</th>
                             <th>Cantidad</th>
                             <th>Categoría</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                 <tbody>
                     @forelse ($productos as $index => $producto)
                         <tr>
-                            {{-- Numeración descendente  (más reciente = número mayor), coherente con el orden descendente --}}
-                            <td>{{ $productos->total() - ($productos->firstItem() + $index) + 1 }}</td>
                             <td>{{ str_pad($producto->id, 3, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $producto->nombre }}</td>
                             <td>{{ $producto->cantidad }}</td>
                             <td>{{ $producto->categoria->nombre ?? 'Sin categoría' }}</td>
                             <td>
-                                <button
-                                    type="button"
-                                    class="btn btn-warning btn-sm edit-btn"
-                                    data-id="{{ $producto->id }}"
-                                    data-nombre="{{ $producto->nombre }}"
-                                    data-cantidad="{{ $producto->cantidad }}"
-                                    data-idcategoria="{{ $producto->idCategoria }}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editProductoModal"
-                                >
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('productos.destroy', $producto->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('¿Eliminar este producto?')" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i>
+                                <span class="badge {{ ($producto->estado ?? 'Activo') === 'Activo' ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $producto->estado ?? 'Activo' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning btn-sm edit-btn"
+                                        data-id="{{ $producto->id }}"
+                                        data-nombre="{{ $producto->nombre }}"
+                                        data-cantidad="{{ $producto->cantidad }}"
+                                        data-idcategoria="{{ $producto->idCategoria }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editProductoModal"
+                                    >
+                                        <i class="fas fa-edit"></i>
                                     </button>
-                                </form>
+                                    <form action="{{ route('productos.destroy', $producto->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        @if($producto->ingresos()->exists() || $producto->egresos()->exists())
+                                            <button type="submit" onclick="return confirm('¿{{ ($producto->estado ?? 'Activo') === 'Activo' ? 'Desactivar' : 'Activar' }} este producto?')" class="btn btn-{{ ($producto->estado ?? 'Activo') === 'Activo' ? 'danger' : 'success' }} btn-sm">
+                                                <i class="fas fa-{{ ($producto->estado ?? 'Activo') === 'Activo' ? 'user-slash' : 'user-check' }}"></i>
+                                            </button>
+                                        @else
+                                            <button type="submit" onclick="return confirm('¿Eliminar este producto permanentemente?')" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        @endif
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

@@ -78,7 +78,6 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Código</th>
                             <th>Tipo Movimiento</th>
                             <th>Fecha Registro</th>
@@ -91,7 +90,6 @@
                     @if(isset($inventarios) && $inventarios->count() > 0)
                         @foreach($inventarios as $index => $inventario)
                             <tr>
-                                <td>{{ $inventarios->total() - ($inventarios->firstItem() + $index) + 1 }}</td>
                                 <td>{{ $inventario->codigo }}</td>
                                 <td>{{ $inventario->tipoMovimiento }}</td>
                                 <td>{{ date('Y-m-d', strtotime($inventario->fechaRegistro)) }}</td>
@@ -129,7 +127,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="7" class="text-center">No hay inventarios registrados.</td>
+                            <td colspan="6" class="text-center">No hay inventarios registrados.</td>
                         </tr>
                     @endif
                 </tbody>

@@ -16,12 +16,15 @@ class RolController extends Controller
         $perPage = $request->get('per_page', 5);
         $search = $request->get('search');
         
+        
         $roles = Roles::when($search, function($query) use ($search) {
                 $query->where('id', 'like', "%{$search}%")
                       ->orWhere('nombre', 'like', "%{$search}%")
                       ->orWhere('descripcion', 'like', "%{$search}%");
             })
-            ->orderBy('created_at','desc')
+            ->orderByRaw("CASE WHEN estado='Activo' THEN 0 ELSE 1 END")
+            ->orderBy('estado', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->appends(['per_page' => $perPage, 'search' => $search]);
             
@@ -113,7 +116,9 @@ class RolController extends Controller
      */
     public function generarPDF()
     {
-        $roles = Roles::orderBy('created_at','desc')->get();
+        $roles = Roles::orderBy('estado', 'desc')
+                      ->orderBy('created_at', 'desc')
+                      ->get();
         $pdf = Pdf::loadView('roles.pdf', compact('roles'));
         return $pdf->download('reporte_roles_'.date('Y-m-d').'.pdf');
     }

@@ -26,6 +26,7 @@ class ProductoController extends Controller
                           $q->where('nombre', 'like', "%{$search}%");
                       });
             })
+            ->orderByRaw("CASE WHEN estado='Activo' THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->appends(['per_page' => $perPage, 'search' => $search]);
@@ -96,8 +97,18 @@ class ProductoController extends Controller
     public function destroy(string $id)
     {
         $producto = Productos::findOrFail($id);
-        $producto->delete();
-        return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
+        
+        $tieneRelaciones = $producto->ingresos()->exists() || $producto->egresos()->exists();
+        
+        if ($tieneRelaciones) {
+            $producto->estado = ($producto->estado === 'Activo') ? 'Inactivo' : 'Activo';
+            $producto->save();
+            $mensaje = $producto->estado === 'Activo' ? 'activado' : 'desactivado';
+            return redirect()->route('productos.index')->with('success', "Producto {$mensaje} correctamente.");
+        } else {
+            $producto->delete();
+            return redirect()->route('productos.index')->with('success', 'Producto eliminado permanentemente.');
+        }
     }
 
     /**
@@ -105,7 +116,10 @@ class ProductoController extends Controller
      */
     public function generarPDF()
     {
-        $productos = Productos::with('categoria')->orderBy('created_at','desc')->get();
+        $productos = Productos::with('categoria')
+                              ->orderByRaw("CASE WHEN estado='Activo' THEN 0 ELSE 1 END")
+                              ->orderBy('created_at','desc')
+                              ->get();
         $pdf = Pdf::loadView('productos.pdf', compact('productos'));
         return $pdf->download('reporte_productos_'.date('Y-m-d').'.pdf');
     }

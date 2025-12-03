@@ -54,29 +54,27 @@
     <div class="header">
         <h1>Reporte de Productos</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ \Carbon\Carbon::now('America/Guayaquil')->format('d/m/Y') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>#</th>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Cantidad</th>
                 <th>Categoría</th>
-                <th>Fecha de Creación</th>
+                <th>Estado</th>
             </tr>
         </thead>
         <tbody>
             @foreach($productos as $index => $producto)
             <tr>
-                <td>{{ count($productos) - $index }}</td>
                 <td>{{ str_pad($producto->id, 3, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $producto->nombre }}</td>
                 <td>{{ $producto->cantidad }}</td>
                 <td>{{ $producto->categoria->nombre ?? 'Sin categoría' }}</td>
-                <td>{{ $producto->created_at->format('d/m/Y') }}</td>
+                <td>{{ $producto->estado ?? 'Activo' }}</td>
             </tr>
             @endforeach
         </tbody>

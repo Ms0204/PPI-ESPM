@@ -7,6 +7,7 @@ use App\Models\Usuarios;
 use App\Models\Roles;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class PermisoController extends Controller
 {
@@ -16,7 +17,12 @@ class PermisoController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $permisos = Permisos::with(['usuario', 'rol'])->orderBy('created_at','desc')->paginate($perPage)->appends(['per_page' => $perPage]);
+        $permisos = Permisos::with(['usuario', 'rol'])
+                // Activos primero (0), Inactivos después (1), cada grupo ordenado por fecha más reciente primero
+                ->orderByRaw("CASE WHEN estado='Activo' THEN 0 ELSE 1 END")
+                ->orderBy('fechaAsignacion', 'desc')
+                    ->paginate($perPage)
+                    ->appends(['per_page' => $perPage]);
         $usuarios = Usuarios::all();
         $roles = Roles::all();
         return view('permisos.index', compact('permisos','usuarios','roles'));
@@ -53,7 +59,8 @@ class PermisoController extends Controller
         // Do not accept id from the user; DB will auto-generate primary key.
         // Set fechaAsignacion to current date and estado to 'Activo' automatically
         $data = $request->only(['cedulaUsuario','idRol']);
-        $data['fechaAsignacion'] = date('Y-m-d');
+        // Usar timezone de Ecuador para la fecha de asignación
+        $data['fechaAsignacion'] = Carbon::now('America/Guayaquil')->toDateString();
         $data['estado'] = 'Activo';
         
         Permisos::create($data);
@@ -125,7 +132,10 @@ class PermisoController extends Controller
      */
     public function generarPDF()
     {
-        $permisos = Permisos::with(['usuario', 'rol'])->orderBy('created_at','desc')->get();
+        $permisos = Permisos::with(['usuario', 'rol'])
+                ->orderByRaw("CASE WHEN estado='Activo' THEN 0 ELSE 1 END")
+                ->orderBy('fechaAsignacion', 'desc')
+                    ->get();
         $pdf = Pdf::loadView('permisos.pdf', compact('permisos'));
         return $pdf->download('reporte_permisos_'.date('Y-m-d').'.pdf');
     }

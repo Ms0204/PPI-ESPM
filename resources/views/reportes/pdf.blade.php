@@ -19,16 +19,15 @@
     <div class="header">
         <h1>Reporte de Reportes</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ \Carbon\Carbon::now('America/Guayaquil')->format('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Título</th><th>Descripción</th><th>Fecha Emisión</th></tr>
+            <tr><th>ID</th><th>Título</th><th>Descripción</th><th>Fecha Emisión</th></tr>
         </thead>
         <tbody>
             @foreach($reportes as $index => $reporte)
             <tr>
-                <td>{{ count($reportes) - $index }}</td>
                 <td>{{ str_pad($reporte->id, 4, '0', STR_PAD_LEFT) }}</td>
                 <td>{{ $reporte->tituloReporte }}</td>
                 <td>{{ $reporte->descripcion }}</td>

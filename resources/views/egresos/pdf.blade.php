@@ -19,21 +19,21 @@
     <div class="header">
         <h1>Reporte de Egresos</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ \Carbon\Carbon::now('America/Guayaquil')->format('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Producto</th><th>Cantidad</th><th>Fecha</th><th>Inventario</th></tr>
+            <tr><th>ID</th><th>Producto</th><th>Cantidad</th><th>Fecha</th><th>Inventario</th><th>Observación</th></tr>
         </thead>
         <tbody>
             @foreach($egresos as $index => $egreso)
             <tr>
-                <td>{{ count($egresos) - $index }}</td>
-                <td>{{ 'EG-' . str_pad($egreso->id, 2, '0', STR_PAD_LEFT) }}</td>
-                <td>{{ $egreso->producto->nombre ?? 'N/A' }}</td>
+                <td>{{ 'EG-' . str_pad($egreso->id, 3, '0', STR_PAD_LEFT) }}</td>
+                <td>{{ str_pad($egreso->idProducto, 3, '0', STR_PAD_LEFT) }} - {{ $egreso->producto->nombre ?? 'N/A' }}</td>
                 <td>{{ $egreso->cantidad }}</td>
                 <td>{{ \Carbon\Carbon::parse($egreso->fechaEgreso)->format('d/m/Y') }}</td>
                 <td>{{ $egreso->inventario->codigo ?? 'N/A' }}</td>
+                <td>{{ $egreso->observacion ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

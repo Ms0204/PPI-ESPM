@@ -92,8 +92,21 @@ class CategoriaController extends Controller
     public function destroy(string $id)
     {
         $categoria = Categorias::findOrFail($id);
-        $categoria->delete();
-        return redirect()->route('categorias.index')->with('success', 'Categoría eliminada correctamente.');
+        
+        // Verificar si tiene productos relacionados
+        $tieneRelaciones = $categoria->productos()->exists();
+        
+        if ($tieneRelaciones) {
+            // Eliminación lógica: alternar estado
+            $categoria->estado = ($categoria->estado == 'Activo') ? 'Inactivo' : 'Activo';
+            $categoria->save();
+            $mensaje = $categoria->estado == 'Activo' ? 'activada' : 'desactivada';
+            return redirect()->route('categorias.index')->with('success', "Categoría {$mensaje} correctamente.");
+        } else {
+            // Eliminación física
+            $categoria->delete();
+            return redirect()->route('categorias.index')->with('success', 'Categoría eliminada correctamente.');
+        }
     }
 
     /**

@@ -69,39 +69,51 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Id</th>
                             <th>Nombre</th>
                             <th>Descripcion</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                 <tbody>
                     @forelse ($categorias as $index => $categoria)
                         <tr>
-                            <td>{{ $categorias->total() - ($categorias->firstItem() + $index) + 1 }}</td>
                             <td>{{ 'CTG-' . str_pad($categoria->id, 2, '0', STR_PAD_LEFT) }}</td>
                             <td>{{ $categoria->nombre }}</td>
                             <td>{{ $categoria->descripcion }}</td>
                             <td>
-                                <button
-                                    type="button"
-                                    class="btn btn-warning btn-sm edit-btn"
-                                    data-id="{{ $categoria->id }}"
-                                    data-nombre="{{ $categoria->nombre }}"
-                                    data-descripcion="{{ $categoria->descripcion }}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editCategoriaModal"
-                                >
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('¿Eliminar esta categoría?')" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i>
+                                <span class="badge {{ $categoria->estado == 'Activo' ? 'bg-success' : 'bg-danger' }}">
+                                    {{ $categoria->estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning btn-sm edit-btn"
+                                        data-id="{{ $categoria->id }}"
+                                        data-nombre="{{ $categoria->nombre }}"
+                                        data-descripcion="{{ $categoria->descripcion }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editCategoriaModal"
+                                    >
+                                        <i class="fas fa-edit"></i>
                                     </button>
-                                </form>
+                                    <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        @if($categoria->productos()->exists())
+                                            <button type="submit" onclick="return confirm('¿{{ $categoria->estado == 'Activo' ? 'Desactivar' : 'Activar' }} esta categoría?')" class="btn btn-{{ $categoria->estado == 'Activo' ? 'danger' : 'success' }} btn-sm">
+                                                <i class="fas fa-{{ $categoria->estado == 'Activo' ? 'user-slash' : 'user-check' }}"></i>
+                                            </button>
+                                        @else
+                                            <button type="submit" onclick="return confirm('¿Eliminar esta categoría permanentemente?')" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        @endif
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

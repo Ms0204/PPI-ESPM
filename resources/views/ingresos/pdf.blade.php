@@ -19,21 +19,21 @@
     <div class="header">
         <h1>Reporte de Ingresos</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ \Carbon\Carbon::now('America/Guayaquil')->format('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>ID</th><th>Producto</th><th>Cantidad</th><th>Fecha</th><th>Inventario</th></tr>
+            <tr><th>ID</th><th>Producto</th><th>Cantidad</th><th>Fecha</th><th>Inventario</th><th>Observación</th></tr>
         </thead>
         <tbody>
             @foreach($ingresos as $index => $ingreso)
             <tr>
-                <td>{{ count($ingresos) - $index }}</td>
                 <td>{{ 'IG-' . str_pad($ingreso->id, 2, '0', STR_PAD_LEFT) }}</td>
-                <td>{{ $ingreso->producto->nombre ?? 'N/A' }}</td>
+                <td>{{ str_pad($ingreso->idProducto, 3, '0', STR_PAD_LEFT) }} - {{ $ingreso->producto->nombre ?? 'N/A' }}</td>
                 <td>{{ $ingreso->cantidad }}</td>
                 <td>{{ \Carbon\Carbon::parse($ingreso->fechaIngreso)->format('d/m/Y') }}</td>
                 <td>{{ $ingreso->inventario->codigo ?? 'N/A' }}</td>
+                <td>{{ $ingreso->observacion ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

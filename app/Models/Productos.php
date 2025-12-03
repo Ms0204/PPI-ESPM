@@ -10,7 +10,8 @@ class Productos extends Model
     protected $fillable = [
         'nombre',
         'cantidad',
-        'idCategoria'
+        'idCategoria',
+        'estado'
     ];
 
     public $timestamps = true;
@@ -25,5 +26,21 @@ class Productos extends Model
     public function categoria()
     {
         return $this->belongsTo(Categorias::class, 'idCategoria', 'id');
+    }
+
+    /**
+     * Relación: Un producto tiene muchos ingresos
+     */
+    public function ingresos()
+    {
+        return $this->hasMany(Ingresos::class, 'idProducto', 'id');
+    }
+
+    /**
+     * Relación: Un producto tiene muchos egresos
+     */
+    public function egresos()
+    {
+        return $this->hasMany(Egresos::class, 'idProducto', 'id');
     }
 }

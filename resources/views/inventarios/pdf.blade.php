@@ -19,16 +19,15 @@
     <div class="header">
         <h1>Reporte de Inventarios</h1>
         <p>Sistema de Gestión | PPI-ESPOMALIA</p>
-        <p>Fecha de generación: {{ date('d/m/Y H:i:s') }}</p>
+        <p>Fecha de generación: {{ date('d/m/Y') }}</p>
     </div>
     <table>
         <thead>
-            <tr><th>#</th><th>Código</th><th>Tipo</th><th>Cantidad</th><th>Fecha</th><th>Usuario</th></tr>
+            <tr><th>Código</th><th>Tipo</th><th>Cantidad</th><th>Fecha</th><th>Usuario</th></tr>
         </thead>
         <tbody>
             @foreach($inventarios as $index => $inventario)
             <tr>
-                <td>{{ count($inventarios) - $index }}</td>
                 <td>{{ $inventario->codigo }}</td>
                 <td>{{ ucfirst($inventario->tipoMovimiento) }}</td>
                 <td>{{ $inventario->cantidadProductos }}</td>
